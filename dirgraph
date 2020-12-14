@@ -1,0 +1,541 @@
+#! /bin/sh
+export POSIXLY_CORRECT=yes
+set -eo pipefail
+path_is_cwd(){
+    echo "Root directory: $PWD"
+    a=$(find . -type d | wc -l) #pocet directories
+    b=$(find . -type f | wc -l) #pocet files
+    c=$(find . -type f | while read -r line; do
+        ls -l "$line" | awk '{print $5}'
+    done)
+    
+    counter_100B=0
+    counter_1KiB=0
+    counter_10KiB=0
+    counter_100KiB=0
+    counter_1MiB=0
+    counter_10MiB=0
+    counter_100MiB=0
+    counter_1GiB=0
+    counter_biggest=0
+    
+    
+    for i in $c ; do
+        if [ "$i" -lt 100 ]; then
+            counter_100B=$((counter_100B+1))
+        elif [ "$i" -lt 1024 ]; then
+            counter_1KiB=$((counter_1KiB+1))
+        elif [ "$i" -lt 10240 ]; then
+            counter_10KiB=$((counter_10KiB+1))
+        elif [ "$i" -lt 102400 ]; then
+            counter_100KiB=$((counter_100KiB+1))
+        elif [ "$i" -lt 1048576 ]; then
+            counter_1MiB=$((counter_1MiB+1))
+        elif [ "$i" -lt 10485760 ]; then
+            counter_10MiB=$((counter_10MiB+1))
+        elif [ "$i" -lt 104857600 ]; then
+            counter_100MiB=$((counter_100MiB+1))
+        elif [ "$i" -lt 1073741824 ]; then
+            counter_1GiB=$((counter_1GiB+1))
+        else
+            counter_biggest=$((counter_biggest+1))
+        fi
+    done
+        
+    if [ "$NORM" -eq 1 ];
+    then
+        test -t 0
+        if [ $? -eq 0 ];
+        then
+            WIDTH=$(tput cols)
+            WIDTH=$((WIDTH-13))
+        else
+            WIDTH=79
+        fi
+
+        BIGGEST=$counter_100B
+        
+        if [ $counter_1KiB -gt $BIGGEST ]; then BIGGEST=$counter_1KiB; fi
+        if [ $counter_10KiB -gt $BIGGEST ]; then BIGGEST=$counter_10KiB; fi
+        if [ $counter_100KiB -gt $BIGGEST ]; then BIGGEST=$counter_100KiB; fi
+        if [ $counter_1MiB -gt $BIGGEST ]; then BIGGEST=$counter_1MiB; fi
+        if [ $counter_10MiB -gt $BIGGEST ]; then BIGGEST=$counter_10MiB; fi
+        if [ $counter_100MiB -gt $BIGGEST ]; then BIGGEST=$counter_100MiB; fi
+        if [ $counter_1GiB -gt $BIGGEST ]; then BIGGEST=$counter_1GiB; fi
+        if [ $counter_biggest -gt $BIGGEST ]; then BIGGEST=$counter_biggest; fi
+
+        if [ "$BIGGEST" -gt "$WIDTH" ];
+        ###   100B   ###
+        then
+            if [ "$counter_100B" -ne 0 ];
+            then
+                counter_100B=$((counter_100B*WIDTH))
+                counter_100B=$((counter_100B/BIGGEST))
+                if [ "$counter_100B" -eq 0 ];
+                then
+                    counter_100B=$((counter_100B+1))
+                fi
+            fi
+        ###   1KiB   ###
+            if [ "$counter_1KiB" -ne 0 ];
+            then
+                counter_1KiB=$((counter_1KiB*WIDTH))
+                counter_1KiB=$((counter_1KiB/BIGGEST))
+                if [ "$counter_1KiB" -eq 0 ];
+                then
+                    counter_1KiB=$((counter_1KiB+1))
+                fi
+            fi
+        ###   10KiB   ###
+            if [ "$counter_10KiB" -ne 0 ];
+            then
+                counter_10KiB=$((counter_10KiB*WIDTH))
+                counter_10KiB=$((counter_10KiB/BIGGEST))
+                if [ "$counter_10KiB" -eq 0 ];
+                then
+                    counter_10KiB=$((counter_10KiB+1))
+                fi
+            fi
+        ###   100KiB   ###
+            if [ "$counter_100KiB" -ne 0 ];
+            then
+                counter_100KiB=$((counter_100KiB*WIDTH))
+                counter_100KiB=$((counter_100KiB/BIGGEST))
+                if [ "$counter_100KiB" -eq 0 ];
+                then
+                    counter_100KiB=$((counter_100KiB+1))
+                fi
+            fi
+        ###   1MiB   ###
+            if [ "$counter_1MiB" -ne 0 ];
+            then
+                counter_1MiB=$((counter_1MiB*WIDTH))
+                counter_1MiB=$((counter_1MiB/BIGGEST))
+                if [ "$counter_1MiB" -eq 0 ];
+                then
+                    counter_1MiB=$((counter_1MiB+1))
+                fi
+            fi
+        ###   10MiB   ###
+            if [ "$counter_10MiB" -ne 0 ];
+            then
+                counter_10MiB=$((counter_10MiB*WIDTH))
+                counter_10MiB=$((counter_10MiB/BIGGEST))
+                if [ "$counter_10MiB" -eq 0 ];
+                then
+                    counter_10MiB=$((counter_10MiB+1))
+                fi
+            fi
+        ###   100MiB   ###
+            if [ "$counter_100MiB" -ne 0 ];
+            then
+                counter_100MiB=$((counter_100MiB*WIDTH))
+                counter_100MiB=$((counter_100MiB/BIGGEST))
+                if [ "$counter_100MiB" -eq 0 ];
+                then
+                    counter_100MiB=$((counter_100MiB+1))
+                fi
+            fi
+        ###   1GiB   ###
+            if [ "$counter_1GiB" -ne 0 ];
+            then
+                counter_1GiB=$((counter_1GiB*WIDTH))
+                counter_1GiB=$((counter_1GiB/BIGGEST))
+                if [ "$counter_1GiB" -eq 0 ];
+                then
+                    counter_1GiB=$((counter_1GiB+1))
+                fi
+            fi
+        ###   Biggest   ###
+            if [ "$counter_biggest" -ne 0 ];
+            then
+                counter_biggest=$((counter_biggest*WIDTH))
+                counter_biggest=$((counter_biggest/BIGGEST))
+                if [ "$counter_biggest" -eq 0 ];
+                then
+                    counter_biggest=$((counter_biggest+1))
+                fi
+            fi
+        fi
+    fi
+    
+    a="$(echo "${a}" | tr -d '[:space:]')"
+    b="$(echo "${b}" | tr -d '[:space:]')"
+    
+    echo "Directories: $a"
+    echo "All files: $b"
+    string_100B="  <100 B  : "
+    string_1KiB="  <1 KiB  : "
+    string_10KiB="  <10 KiB : "
+    string_100KiB="  <100 KiB: "
+    string_1MiB="  <1 MiB  : "
+    string_10MiB="  <10 MiB : "
+    string_100MiB="  <100 MiB: "
+    string_1GiB="  <1 GiB  : "
+    string_biggest="  >=1 GiB : "
+    STR='#'
+    
+    while [ $counter_100B -gt 0 ]; do
+        counter_100B=$((counter_100B-1))
+        string_100B="${string_100B}#"
+    done
+    printf "$string_100B\n"
+    
+    while [ $counter_1KiB -gt 0 ]; do
+        counter_1KiB=$((counter_1KiB-1))
+        string_1KiB="${string_1KiB}#"
+    done
+    printf "$string_1KiB\n"
+    
+    while [ $counter_10KiB -gt 0 ]; do
+        counter_10KiB=$((counter_10KiB-1))
+        string_10KiB="${string_10KiB}#"
+    done
+    printf "$string_10KiB\n"
+    
+    while [ $counter_100KiB -gt 0 ]; do
+        counter_100KiB=$((counter_100KiB-1))
+        string_100KiB="${string_100KiB}#"
+    done
+    printf "$string_100KiB\n"
+    
+    while [ $counter_1MiB -gt 0 ]; do
+        counter_1MiB=$((counter_1MiB-1))
+        string_1MiB="${string_1MiB}#"
+    done
+    printf "$string_1MiB\n"
+    
+    while [ $counter_10MiB -gt 0 ]; do
+        counter_10MiB=$((counter_10MiB-1))
+        string_10MiB="${string_10MiB}#"
+    done
+    printf "$string_10MiB\n"
+    
+    while [ $counter_100MiB -gt 0 ]; do
+        counter_100MiB=$((counter_100MiB-1))
+        string_100MiB="${string_100MiB}#"
+    done
+    printf "$string_100MiB\n"
+    
+    while [ $counter_1GiB -gt 0 ]; do
+        counter_1GiB=$((counter_1GiB-1))
+        string_1GiB="${string_1GiB}#"
+    done
+    printf "$string_1GiB\n"
+    
+    while [ $counter_biggest -gt 0 ]; do
+        counter_biggest=$((counter_biggest-1))
+        string_biggest="${string_biggest}#"
+    done
+    printf "$string_biggest\n"
+}
+
+path_is_given(){
+    DIR="$1"
+    if [ ! -d "$DIR" ]; then
+        >&2 echo "Directory does not exist!"
+        exit 1
+    else
+        echo "Root directory: ""$DIR"
+        a=$(find "$DIR" -type d | wc -l)
+        b=$(find "$DIR" -type f | wc -l)
+        c=$(find "$DIR" -type f | while read -r line; do
+            ls -l "$line" | awk '{print $5}'
+        done)
+        
+        counter_100B=0
+        counter_1KiB=0
+        counter_10KiB=0
+        counter_100KiB=0
+        counter_1MiB=0
+        counter_10MiB=0
+        counter_100MiB=0
+        counter_1GiB=0
+        counter_biggest=0
+        
+        for i in $c ; do
+            if [ "$i" -lt 100 ]; then
+                counter_100B=$((counter_100B+1))
+            elif [ "$i" -lt 1024 ]; then
+                counter_1KiB=$((counter_1KiB+1))
+            elif [ "$i" -lt 10240 ]; then
+                counter_10KiB=$((counter_10KiB+1))
+            elif [ "$i" -lt 102400 ]; then
+                counter_100KiB=$((counter_100KiB+1))
+            elif [ "$i" -lt 1048576 ]; then
+                counter_1MiB=$((counter_1MiB+1))
+            elif [ "$i" -lt 10485760 ]; then
+                counter_10MiB=$((counter_10MiB+1))
+            elif [ "$i" -lt 104857600 ]; then
+                counter_100MiB=$((counter_100MiB+1))
+            elif [ "$i" -lt 1073741824 ]; then
+                counter_1GiB=$((counter_1GiB+1))
+            else
+                counter_biggest=$((counter_biggest+1))
+            fi
+        done
+                
+        if [ "$NORM" -eq 1 ];
+        then
+            test -t 0
+            if [ $? -eq 0 ];
+            then
+                WIDTH=$(tput cols)
+                WIDTH=$((WIDTH-13))
+            else
+                WIDTH=79
+            fi
+
+            BIGGEST=$counter_100B
+            
+            if [ $counter_1KiB -gt $BIGGEST ]; then BIGGEST=$counter_1KiB; fi
+            if [ $counter_10KiB -gt $BIGGEST ]; then BIGGEST=$counter_10KiB; fi
+            if [ $counter_100KiB -gt $BIGGEST ]; then BIGGEST=$counter_100KiB; fi
+            if [ $counter_1MiB -gt $BIGGEST ]; then BIGGEST=$counter_1MiB; fi
+            if [ $counter_10MiB -gt $BIGGEST ]; then BIGGEST=$counter_10MiB; fi
+            if [ $counter_100MiB -gt $BIGGEST ]; then BIGGEST=$counter_100MiB; fi
+            if [ $counter_1GiB -gt $BIGGEST ]; then BIGGEST=$counter_1GiB; fi
+            if [ $counter_biggest -gt $BIGGEST ]; then BIGGEST=$counter_biggest; fi
+
+            if [ "$BIGGEST" -gt "$WIDTH" ];
+            then
+            ###   100B   ###
+                if [ "$counter_100B" -ne 0 ];
+                then
+                    counter_100B=$((counter_100B*WIDTH))
+                    counter_100B=$((counter_100B/BIGGEST))
+                    if [ "$counter_100B" -eq 0 ];
+                    then
+                        counter_100B=$((counter_100B+1))
+                    fi
+                fi
+            ###   1KiB   ###
+                if [ "$counter_1KiB" -ne 0 ];
+                then
+                    counter_1KiB=$((counter_1KiB*WIDTH))
+                    counter_1KiB=$((counter_1KiB/BIGGEST))
+                    if [ "$counter_1KiB" -eq 0 ];
+                    then
+                        counter_1KiB=$((counter_1KiB+1))
+                    fi
+                fi
+            ###   10KiB   ###
+                if [ "$counter_10KiB" -ne 0 ];
+                then
+                    counter_10KiB=$((counter_10KiB*WIDTH))
+                    counter_10KiB=$((counter_10KiB/BIGGEST))
+                    if [ "$counter_10KiB" -eq 0 ];
+                    then
+                        counter_10KiB=$((counter_10KiB+1))
+                    fi
+                fi
+            ###   100KiB   ###
+                if [ "$counter_100KiB" -ne 0 ];
+                then
+                    counter_100KiB=$((counter_100KiB*WIDTH))
+                    counter_100KiB=$((counter_100KiB/BIGGEST))
+                    if [ "$counter_100KiB" -eq 0 ];
+                    then
+                        counter_100KiB=$((counter_100KiB+1))
+                    fi
+                fi
+            ###   1MiB   ###
+                if [ "$counter_1MiB" -ne 0 ];
+                then
+                    counter_1MiB=$((counter_1MiB*WIDTH))
+                    counter_1MiB=$((counter_1MiB/BIGGEST))
+                    if [ "$counter_1MiB" -eq 0 ];
+                    then
+                        counter_1MiB=$((counter_1MiB+1))
+                    fi
+                fi
+            ###   10MiB   ###
+                if [ "$counter_10MiB" -ne 0 ];
+                then
+                    counter_10MiB=$((counter_10MiB*WIDTH))
+                    counter_10MiB=$((counter_10MiB/BIGGEST))
+                    if [ "$counter_10MiB" -eq 0 ];
+                    then
+                        counter_10MiB=$((counter_10MiB+1))
+                    fi
+                fi
+            ###   100MiB   ###
+                if [ "$counter_100MiB" -ne 0 ];
+                then
+                    counter_100MiB=$((counter_100MiB*WIDTH))
+                    counter_100MiB=$((counter_100MiB/BIGGEST))
+                    if [ "$counter_100MiB" -eq 0 ];
+                    then
+                        counter_100MiB=$((counter_100MiB+1))
+                    fi
+                fi
+            ###   1GiB   ###
+                if [ "$counter_1GiB" -ne 0 ];
+                then
+                    counter_1GiB=$((counter_1GiB*WIDTH))
+                    counter_1GiB=$((counter_1GiB/BIGGEST))
+                    if [ "$counter_1GiB" -eq 0 ];
+                    then
+                        counter_1GiB=$((counter_1GiB+1))
+                    fi
+                fi
+            ###   Biggest   ###
+                if [ "$counter_biggest" -ne 0 ];
+                then
+                    counter_biggest=$((counter_biggest*WIDTH))
+                    counter_biggest=$((counter_biggest/BIGGEST))
+                    if [ "$counter_biggest" -eq 0 ];
+                    then
+                        counter_biggest=$((counter_biggest+1))
+                    fi
+                fi
+            fi
+        fi
+        
+        
+        
+        a="$(echo "${a}" | tr -d '[:space:]')"
+        b="$(echo "${b}" | tr -d '[:space:]')"
+        
+        echo "Directories: $a"
+        echo "All files: $b"
+        string_100B="  <100 B  : "
+        string_1KiB="  <1 KiB  : "
+        string_10KiB="  <10 KiB : "
+        string_100KiB="  <100 KiB: "
+        string_1MiB="  <1 MiB  : "
+        string_10MiB="  <10 MiB : "
+        string_100MiB="  <100 MiB: "
+        string_1GiB="  <1 GiB  : "
+        string_biggest="  >=1 GiB : "
+        
+        while [ $counter_100B -gt 0 ]; do
+            counter_100B=$((counter_100B-1))
+            string_100B="${string_100B}#"
+        done
+        printf "$string_100B\n"
+        
+        while [ $counter_1KiB -gt 0 ]; do
+            counter_1KiB=$((counter_1KiB-1))
+            string_1KiB="${string_1KiB}#"
+        done
+        printf "$string_1KiB\n"
+        
+        while [ $counter_10KiB -gt 0 ]; do
+            counter_10KiB=$((counter_10KiB-1))
+            string_10KiB="${string_10KiB}#"
+        done
+        printf "$string_10KiB\n"
+        
+        while [ $counter_100KiB -gt 0 ]; do
+            counter_100KiB=$((counter_100KiB-1))
+            string_100KiB="${string_100KiB}#"
+        done
+        printf "$string_100KiB\n"
+        
+        while [ $counter_1MiB -gt 0 ]; do
+            counter_1MiB=$((counter_1MiB-1))
+            string_1MiB="${string_1MiB}#"
+        done
+        printf "$string_1MiB\n"
+        
+        while [ $counter_10MiB -gt 0 ]; do
+            counter_10MiB=$((counter_10MiB-1))
+            string_10MiB="${string_10MiB}#"
+        done
+        printf "$string_10MiB\n"
+        
+        while [ $counter_100MiB -gt 0 ]; do
+            counter_100MiB=$((counter_100MiB-1))
+            string_100MiB="${string_100MiB}#"
+        done
+        printf "$string_100MiB\n"
+        
+        while [ $counter_1GiB -gt 0 ]; do
+            counter_1GiB=$((counter_1GiB-1))
+            string_1GiB="${string_1GiB}#"
+        done
+        printf "$string_1GiB\n"
+                
+        while [ $counter_biggest -gt 0 ]; do
+            counter_biggest=$((counter_biggest-1))
+            string_biggest="${string_biggest}#"
+        done
+        printf "$string_biggest\n"
+    fi
+}
+
+NORM=0
+
+if [ $# -gt 4 ];
+then
+    >&2 echo "Wrong arguments1"
+    exit 1
+#KED SU 4 PARAMETRE
+elif [ $# == 4 ];
+then
+    if [ "$1" == "-i" ];
+    then
+        if [ "$3" == "-n" ];
+        then
+        NORM=1
+            path_is_given "$4"
+        else
+            >&2 echo "Wrong arguments!"
+            exit 1
+        fi
+    else
+        >&2 echo "Wrong arguments!"
+        exit 1
+    fi
+
+#KED SU 3 PARAMETRE
+elif [ $# == 3 ];
+then
+    if [ "$1" == "-i" ];
+    then
+        if [ "$3" == "-n" ];
+        then
+        NORM=1
+            path_is_cwd
+        else
+            path_is_given "$3"
+        fi
+    else
+        >&2 echo "Wrong arguments!"
+        exit 1
+    fi
+
+#KED SU 2 PARAMETRE
+elif [ $# == 2 ];
+then
+    if [ "$1" == "-i" ];
+    then
+        path_is_cwd
+    elif [ "$1" == "-n" ];
+    then
+    NORM=1
+        path_is_given "$2"
+    else
+        >&2 echo "Wrong arguments!"
+        exit 1
+    fi
+
+#KED JE 1 PARAMETER
+elif [ $# == 1 ];
+then
+    if [ "$1" == "-n" ];
+    then
+        NORM=1
+        path_is_cwd
+    else
+        path_is_given "$1"
+    fi
+    
+#KED JE 0 PARAMETROV
+elif [ $# == 0 ];
+then
+    path_is_cwd
+fi
+
+    
